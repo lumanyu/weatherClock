@@ -624,7 +624,7 @@ while running:
 
         pen.clear()
 
-    except KeyboardInterrupt:
+    except KeyboardInterrupt:  # 捕获键盘动作
         print("Exiting WeatherClock.")
         exit(0)
 
