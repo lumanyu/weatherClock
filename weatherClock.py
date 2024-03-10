@@ -40,8 +40,8 @@ try:
     temperature_values = False 
     wind_values = False
     values_color = "gray"
-    global_x_shift = 0
-    global_y_shift = 0
+    global_x_shift = 0  # 设置x坐标偏移，默认是0，同时支持在setting.json里面设置，方便做时间的全局移动
+    global_y_shift = 0  # 设置y坐标偏移，默认是0，同时支持在setting.json里面设置，方便做时间的全局移动
     weather_text_description = -30
     weather_text_data = 30
     weather_text_vert_spacing = 40
@@ -161,7 +161,7 @@ else:
     logging.info(f"Units not set. OpenWeatherMap.org defaults to 'standard'.")
 url = f'http://api.openweathermap.org/data/2.5/onecall?{url_params}'
 
-weatherUpdatePeriod = 10
+weatherUpdatePeriod = 10  # 天气更新间隔，因为那个天气获取api有一定免费额度，这个时间建议调整大一点
 
 temp_array = [0] * 12
 temp_feel_array = [0] * 12
@@ -367,8 +367,8 @@ def update_forecast():
 
     logging.debug("---- update_forecast() ----")
 
-    hour_cursor = int(time.strftime("%I"))
-    meridiem = time.strftime('%p')
+    hour_cursor = int(time.strftime("%I"))  # %I表示12小时制
+    meridiem = time.strftime('%p')  # %p表示上午AM或者下午PM
 
     logging.debug("hour_cursor: " + str(hour_cursor))
 
@@ -389,10 +389,10 @@ def update_forecast():
         else:
             logging.debug("rain: " + str(data["hourly"][num]["rain"]))
 
-        temp_array[num] = data["hourly"][num]["temp"]
-        temp_feel_array[num] = data["hourly"][num]["feels_like"]
-        wind_array[num] = data["hourly"][num]["wind_speed"]      
-        id_array[num] = data["hourly"][num]["weather"][0]["id"]
+        temp_array[num] = data["hourly"][num]["temp"]  # 温度
+        temp_feel_array[num] = data["hourly"][num]["feels_like"]  # 体感温度
+        wind_array[num] = data["hourly"][num]["wind_speed"]  # 风速
+        id_array[num] = data["hourly"][num]["weather"][0]["id"]  # 天气icon id，见https://openweathermap.org/weather-conditions
 
         path_theme = os.path.join(path, theme)
 
@@ -426,7 +426,7 @@ def update_forecast():
     logging.debug(idImage_array)
 
     for image in idImage_array:
-        wn.addshape(image)
+        wn.addshape(image)  # 画布上画上天气图标
 
 
 wn = turtle.Screen()
@@ -473,16 +473,17 @@ s = 0
 def draw_clock(hour, minute, second, pen):
     pen.hideturtle()
 
-    # Draw the hour hand
-    pen.penup()
+    # Draw the hour han
+    # 有关Python Turtle常用的操作见http://www.cse.msu.edu/~ldillon/cse-ctl/Spring2015/Meeting07/turtleCheatSheet.pdf 
+    pen.penup()  # 暂停绘画，和底下的pendown是一对
     pen.goto(global_x_shift, global_y_shift)
     pen.color(hour_color)
-    pen.pensize(6)
-    pen.setheading(90)
-    angle = (hour / 12) * 360 + (minute/60) * 30
-    pen.rt(angle)
-    pen.pendown()
-    pen.fd(hour_hand)
+    pen.pensize(6)  # 小时针的宽度
+    pen.setheading(90)  # 设置角度，0(east), 90(north), 180(west), 270(south)
+    angle = (hour / 12) * 360 + (minute/60) * 30  # 根据当前时间,小时针应该便宜的角度
+    pen.rt(angle)  # 向右/顺时针旋转角度，turtle.rt和turtle.right一样
+    pen.pendown()  # 开始绘画，和上面的penup是一对
+    pen.fd(hour_hand)  # 小时针的长度，向前绘制，turtle.fd同turtle.forward
 
     # Draw the minute hand
     pen.penup()
