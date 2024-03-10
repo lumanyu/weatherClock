@@ -32,6 +32,7 @@ try:
     if options:
         print(f"Options: {options}")
     api_key = False
+    ip2location_key = False
     theme = "default"
     log_level = False
     latitude = False
@@ -94,6 +95,9 @@ try:
         if not api_key:
             api_key_setting = settings.get('ApiKey')
             api_key = api_key_setting if api_key_setting else False
+        if not ip2location_key:
+            ip2location_key_setting = settings.get('Ip2LocationKey')
+            ip2location_key = ip2location_key_setting if ip2location_key_setting else False
         theme = settings.get('Theme')    
         if not log_level:
             log_level = settings.get('LogLevel')
@@ -154,12 +158,24 @@ else:
     raise ValueError("LogLevel (--loglevel) must be one of: [Debug|Info|Information|Warn|Warning|Error]")
 
 
+ip2location_url=f'https://api.ip2location.io/?key={ip2location_key}'
+
+res = requests.get(ip2location_url)
+if res.ok:
+    ip2location_data = res.json()
+    latitude=ip2location_data['latitude']
+    longitude=ip2location_data['longitude']
+else:
+    data = None
+    res.raise_for_status()
+
+
 url_params = f'lat={latitude}&lon={longitude}&exclude=current,minutely,daily,alerts,flags&appid={api_key}'
 if units:
     url_params += f"&units={units}"
 else:
     logging.info(f"Units not set. OpenWeatherMap.org defaults to 'standard'.")
-url = f'http://api.openweathermap.org/data/2.5/onecall?{url_params}'
+url = f'http://api.openweathermap.org/data/3.0/onecall?{url_params}'
 
 weatherUpdatePeriod = 10  # 天气更新间隔，因为那个天气获取api有一定免费额度，这个时间建议调整大一点
 
